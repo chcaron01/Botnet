@@ -1,0 +1,89 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Botnet command center</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+</head>
+
+<body style="background-color:#000040;" class="text-light">
+	<div class="container">
+		<div class="row">
+			<div class="col-md">
+				<h1 class="display-1 text-center">Command Center</h1>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-md">
+				<h3 class="text-center">Execute new bot command</h3>
+				<div id="command" class="justify-content-center class=form-group">
+					Command 
+					<input type="text" id="cmd" class="form-control"> <br>
+					<input class="btn btn-primary" onclick="command()" type="submit" value="Go">
+				</div>
+				<br>
+				<h3 class="text-center">Add new bot</h3>
+				<div id="addbot" class="form-group">
+					Host <input id="host" type="text" class="form-control"> <br>
+					Username <input id="username" type="text" class="form-control"> <br>
+					Password <input id="password" type="password" class="form-control"> <br>
+					<input type="submit" class="btn btn-primary" onclick="addbot()" value="Go">
+				</div>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col">
+				<h3 class="text-center"> Controlled Hosts </h3>
+				<div id="bots">
+				</div>
+			</div>
+            <div class="col">
+				<h3 class="text-center"> Host Status </h3>
+				<div id="status">
+				</div>
+			</div>
+	    </div>
+    </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"> </script>
+  <script>
+
+  	function addbot(){
+  		$.post('http://localhost:5000/add_bot', {host: $("#host").val(), username: $("#username").val(), password: $("#password").val()})
+  		write_bots()
+  	}
+
+  	$(document).ready(function(){
+  		write_bots()
+  	})
+
+  	function write_bots(){
+  		$.get('http://localhost:5000/get_bots', function (data){
+  			data = JSON.parse(data)
+  			$("#bots").empty()
+  			$("#status").empty()
+  			for (i = 0; i < data["bots"].length; i++){
+  				$("#bots").append("<p class=\"text-center\">" + data["bots"][i]["host"] + "</p")
+  				$("#status").append("<p class=\"text-center\">Ready</p")
+  			}
+  		})
+  	}
+
+  	function command(){
+  		$.get('http://localhost:5000/command', {cmd: $('#cmd').val()}, function(data) {
+  			data = JSON.parse(data)
+  			$("#status").empty()
+  			for (i=0; i < data["status"].length; i++){
+  			    $("#status").append("<p class=\"text-center\">" + data["status"][i] + "</p>")
+  			}
+  		})
+  	}
+
+  </script>
+</body>
+</html>
